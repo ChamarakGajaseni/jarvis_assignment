@@ -14,25 +14,20 @@ def SpeakText(command):
     engine.say(command)
     engine.runAndWait()
 
-#initiate recognizer
 r = sr.Recognizer()
 
 def record_text():
-    #loop in case of error
+
     while(True):
         try:
-            # use the microphone as source for input.
             with sr.Microphone() as source2:
                 
-                # wait for a second to let the recognizer
-                # adjust the energy threshold based on
-                # the surrounding noise level 
                 r.adjust_for_ambient_noise(source2, duration=0.2)
                 
-                #listens for the user's input 
+                print("say something...")
+                
                 audio2 = r.listen(source2)
                 
-                # Using google to recognize audio
                 MyText = r.recognize_google(audio2)
                 MyText = MyText.lower()
     
@@ -46,7 +41,7 @@ def record_text():
 
 def send_to_GPT(messages , model="gpt-3.5-turbo"):
 
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model=model,
         messages=messages,
         max_tokens=100,
@@ -65,10 +60,11 @@ while(True):
     text = record_text()
     if "exit" in text or "fuck off" in text or "quit" in text:
         print(f"User: " ,text)
-        print("okay..okay....geez")
+        print("JARVIS: okay..okay....geez")
         break
+    
+    print(f"User: " ,text)
     messages = [{"role":"user", "content": text}]
     response = send_to_GPT(messages)
-    SpeakText(response)
-
-    print(response)
+    print("JARVIS: " + response[1].content)
+    SpeakText(response[1].content)
